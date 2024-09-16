@@ -1,5 +1,5 @@
 services:
-  tp-revenue:
+  fktblink:
     # image: docker.io/library/tp-revenue-python
     container_name: fktblink 
     build: .
