@@ -7,7 +7,9 @@ import re
 # Define the regex pattern to match the URLs
 url_pattern = re.compile(r"(http:\/\/e\.tb\.cn\/[^\s]+|https:\/\/m\.tb\.cn\/[^\s]+)")
 
-url_pattern_item = re.compile(r"(https:\/\/item\.taobao\.com\/item\.htm[^\s]*)")
+url_pattern_item = re.compile(
+    r"(https:\/\/item\.taobao\.com\/item\.htm[^\s]*|https:\/\/detail\.tmall\.com\/item\.htm[^\s]*)"
+)
 
 
 # Store the last clipboard content to avoid repeated processing
@@ -56,13 +58,23 @@ try:
             if url_match_item:
                 share_link = url_match_item.group(0)
                 print(f"Matched URL: {share_link}")
-                long_pattern = (
-                    r"https://item\.taobao\.com/item\.htm\?.*?id=(\d+).*?skuId=(\d+)"
+                match = re.search(
+                    r"https://item\.taobao\.com/item\.htm\?.*?id=(\d+).*?skuId=(\d+)",
+                    share_link,
                 )
-                match = re.search(long_pattern, share_link)
+                match_tmall = re.search(
+                    r"https://detail\.tmall\.com/item\.htm\?.*?id=(\d+).*?skuId=(\d+)",
+                    share_link,
+                )
+
                 if match:
                     # Constructing the URL from matched groups
                     extracted_url = f"https://item.taobao.com/item.htm?id={match.group(1)}&skuId={match.group(2)}"
+                    pyperclip.copy(extracted_url)
+                    print("Extracted URL copied:", extracted_url)
+                if match_tmall:
+                    # Constructing the URL from matched groups
+                    extracted_url = f"https://detail.tmall.com/item.htm?id={match_tmall.group(1)}&skuId={match_tmall.group(2)}"
                     pyperclip.copy(extracted_url)
                     print("Extracted URL copied:", extracted_url)
                 else:
