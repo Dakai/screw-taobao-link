@@ -22,8 +22,8 @@ HTML_TEMPLATE = r"""
         function parseLink() {
             const shareContent = document.getElementById('shareLink').value;
             let urlMatch = shareContent.match(/(http:\/\/e\.tb\.cn\/[^\s]+)/);
-                if (urlMatch && urlMatch[0]) {
-                    const shareLink = urlMatch[0];
+            if (urlMatch && urlMatch[0]) {
+                const shareLink = urlMatch[0];
 
                 fetch('/parse', {
                     method: 'POST',
@@ -46,15 +46,27 @@ HTML_TEMPLATE = r"""
                 });
             }
         }
-        document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('shareLink').addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault(); // Prevents the default action (like a newline in textarea)
-                        parseLink(); // Call the parse function
-                    }
-                });
+
+        function retrieveClipboardContent() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('shareLink').value = text;
+            }).catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
             });
-        </script>
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            retrieveClipboardContent().then(() => {
+                parseLink(); // Automatically parse the link after retrieving clipboard content
+            });
+            document.getElementById('shareLink').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevents the default action (like a newline in textarea)
+                    parseLink(); // Call the parse function
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <h1>Share Link Parser</h1>
