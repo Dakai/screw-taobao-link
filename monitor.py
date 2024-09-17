@@ -7,6 +7,9 @@ import re
 # Define the regex pattern to match the URLs
 url_pattern = re.compile(r"(http:\/\/e\.tb\.cn\/[^\s]+|https:\/\/m\.tb\.cn\/[^\s]+)")
 
+url_pattern_item = re.compile(r"(https:\/\/item\.taobao\.com\/item\.htm[^\s]*)")
+
+
 # Store the last clipboard content to avoid repeated processing
 last_clipboard = ""
 
@@ -22,6 +25,7 @@ try:
 
             # Try to match the URL pattern
             url_match = url_pattern.search(clipboard_content)
+            url_match_item = url_pattern_item.search(clipboard_content)
 
             if url_match:
                 share_link = url_match.group(0)
@@ -48,6 +52,21 @@ try:
                     print("URL pattern not found.")
             else:
                 print("No matching URL found in clipboard.")
+
+            if url_match_item:
+                share_link = url_match_item.group(0)
+                print(f"Matched URL: {share_link}")
+                long_pattern = (
+                    r"https://item\.taobao\.com/item\.htm\?.*?id=(\d+).*?skuId=(\d+)"
+                )
+                match = re.search(long_pattern, share_link)
+                if match:
+                    # Constructing the URL from matched groups
+                    extracted_url = f"https://item.taobao.com/item.htm?id={match.group(1)}&skuId={match.group(2)}"
+                    pyperclip.copy(extracted_url)
+                    print("Extracted URL copied:", extracted_url)
+                else:
+                    print("No match found")
 
         # Sleep for a short duration before checking the clipboard again
         time.sleep(1)  # Check every second to avoid excessive CPU usage
