@@ -1,8 +1,19 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(
+    app,
+    resources={
+        r"/parse": {
+            "origins": [
+                "https://admin.thecopierparts.com",  # Production domain
+            ]
+        }
+    },
+)
 
 
 @app.route("/")
