@@ -21,6 +21,8 @@ TAOBAO_URL_PATTERN = re.compile(
 JS_URL_PATTERN = re.compile(r"var url = '([^']+)'")
 
 app = Flask(__name__)
+session = requests.Session()
+session.headers.update({"User-Agent": "Mozilla/5.0"})
 CORS(
     app,
     resources={r"/parse": {"origins": ALLOWED_ORIGINS}},
@@ -90,12 +92,7 @@ def parse() -> Union[Response, Tuple[Response, int]]:
 
     try:
         # Make request to the share link
-        response = requests.get(
-            share_link,
-            allow_redirects=True,
-            timeout=TIMEOUT_SECONDS,
-            headers={"User-Agent": "Mozilla/5.0"},
-        )
+        response = session.get(share_link, allow_redirects=True, timeout=TIMEOUT_SECONDS)
         response.raise_for_status()
 
         # Extract Taobao URL
